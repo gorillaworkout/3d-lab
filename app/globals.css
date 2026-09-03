@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0b0d10;
+  --surface: #14181e;
+  --surface-2: #1b2129;
+  --border: #2a323d;
+  --text: #e8edf2;
+  --muted: #8b95a3;
+  --accent: #e8a54b;
+  --accent-2: #f0c27a;
+  --danger: #e85d4c;
+  --ok: #3dba7a;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.field {
+  width: 100%;
+  background: #0d1116;
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+}
+
+.field:focus {
+  outline: 2px solid color-mix(in oklab, var(--accent) 55%, transparent);
+  outline-offset: 1px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 10px;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: #1a1206;
+  border-color: #c8882b;
+  font-weight: 650;
+}
+
+.btn-danger {
+  background: #3a1814;
+  color: #ffc7c0;
+  border-color: #6a2c24;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.banner-demo {
+  background: #5a220c;
+  color: #ffe7c8;
+  border-bottom: 1px solid #8a3d16;
+}
