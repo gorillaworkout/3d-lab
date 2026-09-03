@@ -3,6 +3,7 @@ import path from "node:path";
 import { DEFAULT_SETTINGS, type AppSettings, type Job, type KasEntry } from "@/lib/types";
 import { isFirebaseAdminConfigured } from "@/lib/env";
 import { getFirebaseAdmin } from "@/lib/firebase/admin";
+import { FIRESTORE_COLLECTIONS, firebaseStorageObjectPath } from "@/lib/store/namespace";
 
 const DATA_DIR = path.join(process.cwd(), ".data");
 const DB_PATH = path.join(DATA_DIR, "db.json");
@@ -50,7 +51,7 @@ export async function listJobs(): Promise<Job[]> {
   if (isFirebaseAdminConfigured()) {
     const admin = await getFirebaseAdmin();
     if (admin) {
-      const snap = await admin.firestore().collection("jobs").orderBy("created_at", "desc").get();
+      const snap = await admin.firestore().collection(FIRESTORE_COLLECTIONS.jobs).orderBy("created_at", "desc").get();
       return snap.docs.map((d) => d.data() as Job);
     }
   }
@@ -62,7 +63,7 @@ export async function getJob(id: string): Promise<Job | null> {
   if (isFirebaseAdminConfigured()) {
     const admin = await getFirebaseAdmin();
     if (admin) {
-      const doc = await admin.firestore().collection("jobs").doc(id).get();
+      const doc = await admin.firestore().collection(FIRESTORE_COLLECTIONS.jobs).doc(id).get();
       return doc.exists ? (doc.data() as Job) : null;
     }
   }
@@ -74,7 +75,7 @@ export async function saveJob(job: Job): Promise<Job> {
   if (isFirebaseAdminConfigured()) {
     const admin = await getFirebaseAdmin();
     if (admin) {
-      await admin.firestore().collection("jobs").doc(job.id).set(job);
+      await admin.firestore().collection(FIRESTORE_COLLECTIONS.jobs).doc(job.id).set(job);
       return job;
     }
   }
@@ -90,7 +91,7 @@ export async function listKas(): Promise<KasEntry[]> {
   if (isFirebaseAdminConfigured()) {
     const admin = await getFirebaseAdmin();
     if (admin) {
-      const snap = await admin.firestore().collection("kas").orderBy("date", "desc").get();
+      const snap = await admin.firestore().collection(FIRESTORE_COLLECTIONS.kas).orderBy("date", "desc").get();
       return snap.docs.map((d) => d.data() as KasEntry);
     }
   }
@@ -102,7 +103,7 @@ export async function saveKas(entry: KasEntry): Promise<KasEntry> {
   if (isFirebaseAdminConfigured()) {
     const admin = await getFirebaseAdmin();
     if (admin) {
-      await admin.firestore().collection("kas").doc(entry.id).set(entry);
+      await admin.firestore().collection(FIRESTORE_COLLECTIONS.kas).doc(entry.id).set(entry);
       return entry;
     }
   }
@@ -116,7 +117,7 @@ export async function getSettings(): Promise<AppSettings> {
   if (isFirebaseAdminConfigured()) {
     const admin = await getFirebaseAdmin();
     if (admin) {
-      const doc = await admin.firestore().collection("settings").doc("app").get();
+      const doc = await admin.firestore().collection(FIRESTORE_COLLECTIONS.settings).doc("app").get();
       if (doc.exists) return { ...DEFAULT_SETTINGS, ...(doc.data() as AppSettings) };
     }
   }
@@ -129,7 +130,7 @@ export async function saveSettings(settings: AppSettings): Promise<AppSettings> 
   if (isFirebaseAdminConfigured()) {
     const admin = await getFirebaseAdmin();
     if (admin) {
-      await admin.firestore().collection("settings").doc("app").set(next);
+      await admin.firestore().collection(FIRESTORE_COLLECTIONS.settings).doc("app").set(next);
       return next;
     }
   }
@@ -148,7 +149,7 @@ export async function saveFile(
     const admin = await getFirebaseAdmin();
     if (admin) {
       const bucket = admin.storage().bucket();
-      const file = bucket.file(relPath);
+      const file = bucket.file(firebaseStorageObjectPath(relPath));
       await file.save(buffer, { contentType, resumable: false });
       try {
         await file.makePublic();
