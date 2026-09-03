@@ -43,7 +43,7 @@ Do not invent Firebase or Tripo credentials. Paste values from your own consoles
 2. Add a web app; copy the public config into `NEXT_PUBLIC_FIREBASE_*`.
 3. Create the single admin user (Bayu) in Authentication — no public signup in this app.
 4. For production persist: download a service account, set `FIREBASE_ADMIN_PROJECT_ID`, `FIREBASE_ADMIN_CLIENT_EMAIL`, `FIREBASE_ADMIN_PRIVATE_KEY` (escape newlines as `\n`), and `FIREBASE_STORAGE_BUCKET`.
-5. Firestore collections used: `jobs`, `kas`, `settings/app`. Storage paths: `jobs/{id}/photo.*`, `model.glb`, `model.stl`.
+5. Firestore collections used: `3dlab_jobs`, `3dlab_kas`, `3dlab_settings/app` (doc id `app` unchanged). Storage paths: `3dlab/jobs/{id}/photo.*`, `model.glb`, `model.stl`. Local `.data/` keeps unprefixed keys.
 
 Without Firebase: `/login` explains the empty config. Production stays closed. Development can set `DEV_AUTH_BYPASS=1` for a demo session with a large warning banner.
 
