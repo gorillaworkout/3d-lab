@@ -43,13 +43,13 @@ export interface TripoProvider {
   downloadModel(url: string): Promise<Buffer>;
 }
 
-type MockRecord = {
-  createdAt: number;
-  delayMs: number;
-  glb: Buffer;
-};
+const MOCK_DELAY_MS = 1200;
 
-const mockTasks = new Map<string, MockRecord>();
+function mockCreatedAt(taskId: string): number {
+  const raw = taskId.startsWith("mock_") ? taskId.slice(5) : "";
+  const parsed = Number.parseInt(raw, 36);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
 
 export class MissingTripoKeyError extends Error {
   constructor() {
@@ -89,11 +89,6 @@ class MockTripoProvider implements TripoProvider {
 
   async imageToModel(): Promise<TripoTask> {
     const task_id = `mock_${Date.now().toString(36)}`;
-    mockTasks.set(task_id, {
-      createdAt: Date.now(),
-      delayMs: 1200,
-      glb: createCubeGlb(20),
-    });
     return {
       task_id,
       status: "queued",
@@ -106,24 +101,12 @@ class MockTripoProvider implements TripoProvider {
   }
 
   async getTask(taskId: string): Promise<TripoTask> {
-    const rec = mockTasks.get(taskId);
-    if (!rec) {
-      return {
-        task_id: taskId,
-        status: "failed",
-        progress: 0,
-        model_url: null,
-        credits_consumed: 0,
-        error: "Task mock tidak ditemukan",
-        mock: true,
-      };
-    }
-    const elapsed = Date.now() - rec.createdAt;
-    if (elapsed < rec.delayMs) {
+    const elapsed = Date.now() - mockCreatedAt(taskId);
+    if (elapsed < MOCK_DELAY_MS) {
       return {
         task_id: taskId,
         status: "running",
-        progress: Math.min(90, Math.round((elapsed / rec.delayMs) * 100)),
+        progress: Math.min(90, Math.max(5, Math.round((elapsed / MOCK_DELAY_MS) * 100))),
         model_url: null,
         credits_consumed: 0,
         error: null,
@@ -145,10 +128,8 @@ class MockTripoProvider implements TripoProvider {
     return { balance: 980, frozen: 0, available: true, mock: true, message: "Saldo MOCK" };
   }
 
-  async downloadModel(url: string): Promise<Buffer> {
-    const id = url.replace("mock://cube/", "").replace(".glb", "");
-    const rec = mockTasks.get(id);
-    return rec?.glb ?? createCubeGlb(20);
+  async downloadModel(): Promise<Buffer> {
+    return createCubeGlb(20);
   }
 }
 
